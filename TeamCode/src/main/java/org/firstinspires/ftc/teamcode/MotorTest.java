@@ -12,8 +12,8 @@ public class MotorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        motor = hardwareMap.get(DcMotor.class, "motor1");
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor = hardwareMap.get(DcMotor.class, RobotConstants.motor1Name);
+        motor.setDirection(RobotConstants.motor1Dir);
         waitForStart();
 
         while (opModeIsActive()) {
