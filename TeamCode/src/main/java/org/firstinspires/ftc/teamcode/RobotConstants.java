@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class RobotConstants {
     public static String leftBackDriveName = "backLeft";
-    public static String rightBackDriveName = "backright";
-    public static String leftFrontDriveName = "FrontLeft";
-    public static String rightFrontDriveName = "Frontright";
+    public static String rightBackDriveName = "backRight";
+    public static String leftFrontDriveName = "frontLeft";
+    public static String rightFrontDriveName = "frontRight";
 
-    public static DcMotorSimple.Direction leftBackDriveDirection = DcMotorSimple.Direction.FORWARD;
+    public static DcMotorSimple.Direction leftBackDriveDirection = DcMotorSimple.Direction.REVERSE;
     public static DcMotorSimple.Direction rightBackDriveDirection = DcMotorSimple.Direction.FORWARD;
-    public static DcMotorSimple.Direction leftFrontDriveDirection = DcMotorSimple.Direction.FORWARD;
+    public static DcMotorSimple.Direction leftFrontDriveDirection = DcMotorSimple.Direction.REVERSE;
     public static DcMotorSimple.Direction rightFrontDriveDirection = DcMotorSimple.Direction.FORWARD;
 
 
