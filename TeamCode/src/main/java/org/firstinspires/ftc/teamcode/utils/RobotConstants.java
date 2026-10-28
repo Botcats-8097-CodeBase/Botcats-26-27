@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.utils;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class RobotConstants {
@@ -14,5 +13,8 @@ public class RobotConstants {
     public static DcMotorSimple.Direction leftFrontDriveDirection = DcMotorSimple.Direction.REVERSE;
     public static DcMotorSimple.Direction rightFrontDriveDirection = DcMotorSimple.Direction.FORWARD;
 
+    //---------//
 
+    public static String pollenSpinnerName = "pollenSpinner";
+    public static DcMotorSimple.Direction pollenSpinnerDirection = DcMotorSimple.Direction.FORWARD;
 }
