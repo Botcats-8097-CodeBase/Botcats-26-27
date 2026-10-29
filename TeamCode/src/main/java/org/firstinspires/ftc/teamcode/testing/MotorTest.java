@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testing;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+@Disabled
 @TeleOp (name = "motorTest")
 public class MotorTest extends LinearOpMode {
     DcMotor motor = null;
@@ -12,8 +13,8 @@ public class MotorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        motor = hardwareMap.get(DcMotor.class, "motor1");
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        //motor = hardwareMap.get(DcMotor.class, RobotConstants.motor1Name);
+        //motor.setDirection(RobotConstants.motor1Dir);
         waitForStart();
 
         while (opModeIsActive()) {
