@@ -14,7 +14,7 @@ public class smallShooterTest extends LinearOpMode {
         smallShooter = hardwareMap.get(DcMotor.class, RobotConstants.smallShooterName);
         smallShooter.setDirection(RobotConstants.smallShooterDir);
         //fdfdf
-
+//fd
         waitForStart();
 
         while (opModeIsActive()) {
