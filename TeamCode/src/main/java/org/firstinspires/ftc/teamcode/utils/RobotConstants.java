@@ -17,4 +17,8 @@ public class RobotConstants {
 
     public static String pollenSpinnerName = "pollenSpinner";
     public static DcMotorSimple.Direction pollenSpinnerDirection = DcMotorSimple.Direction.FORWARD;
+
+    public static String intake = "intakeMotor";
+    public static DcMotorSimple.Direction intakeDirection = DcMotorSimple.Direction.REVERSE;
+
 }
