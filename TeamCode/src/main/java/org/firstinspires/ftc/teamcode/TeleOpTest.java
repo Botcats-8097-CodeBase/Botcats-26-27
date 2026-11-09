@@ -89,7 +89,7 @@ public class TeleOpTest extends OpMode {
             imu.initialize(parameters);
         }
 
-        //retrieve robot yaw and control robot w/ joystick
+        //retrieve robot yaw and control robot w/ joysticks
         YawPitchRollAngles robotOrientation = imu.getRobotYawPitchRollAngles();
         double yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
         robot.drivePower(new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw-yawOffset)), gamepad1.right_stick_x, coefficient);
@@ -107,6 +107,7 @@ public class TeleOpTest extends OpMode {
             intake.setIntakeMotor(0);
         }
 
+        //set shooter
         if (gamepad1.a) {
             shooter.setTargetVelocity(targVel);
         }
