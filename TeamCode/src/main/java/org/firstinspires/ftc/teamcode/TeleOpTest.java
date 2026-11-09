@@ -32,7 +32,9 @@ public class TeleOpTest extends OpMode {
     ElapsedTime et = new ElapsedTime();
 
     BasicRobot robot = new BasicRobot();
-    VelocityMotor shooter = new VelocityMotor(0.3);
+    VelocityMotor shooter = new VelocityMotor(
+            new PIDFController(0.001, 0, 0, 0.000397, 0),
+            0.3);
 
     Intake intake = new Intake();
 
@@ -51,6 +53,8 @@ public class TeleOpTest extends OpMode {
 
     double intakeSpeed = 0;
     double targVel = 2500;
+
+    boolean wasShooting = false;
 
     @Override
     public void init() {
@@ -106,15 +110,20 @@ public class TeleOpTest extends OpMode {
         if (gamepad1.a) {
             shooter.setTargetVelocity(targVel);
         }
-        else {
-            shooter.setTargetVelocity(0);
+        else if (wasShooting) {
+            shooter.stop();
         }
+        wasShooting = gamepad1.a;
         shooter.update();
 
         pTelemetry.addData("targVel", shooter.getTargetVelocity());
         pTelemetry.addData("currentVel", shooter.getCurrVel());
         pTelemetry.addData("intakeSpeed", intakeSpeed);
+        pTelemetry.addData("shooterPower", shooter.getAppliedPower());
+
+        pTelemetry.update();
     }
+
 
     void initRobot() {
         //hardware mapping expansion hub, imu
@@ -128,9 +137,7 @@ public class TeleOpTest extends OpMode {
         //class init
         robot.init(hardwareMap);
         intake.init(hardwareMap);
-        shooter.init(hardwareMap, RobotConstants.pollenSpinnerName);
-        shooter.motor.setDirection(RobotConstants.pollenSpinnerDirection);
-        shooter.setVelController(new PIDFController(0.001, 0, 0, 0.000397, 0));
+        shooter.init(hardwareMap, RobotConstants.pollenSpinnerName, RobotConstants.pollenSpinnerDirection);
     }
 
     @Override

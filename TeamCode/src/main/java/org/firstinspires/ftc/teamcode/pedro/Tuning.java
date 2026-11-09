@@ -13,8 +13,4 @@ public class Tuning {
         return new MecanumTuner();
     }
 
-    @Tuner
-    public static Procedure octoquadTuner() {
-        return new OctoQuadTuner();
-    }
 }

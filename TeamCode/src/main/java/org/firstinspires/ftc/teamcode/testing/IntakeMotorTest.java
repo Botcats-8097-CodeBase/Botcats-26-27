@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.utils.Intake;
 @TeleOp (name = "Intake Motor Test")
 public class IntakeMotorTest extends OpMode {
     Intake intake = new Intake();
+
     @Override
     public void init() {
         intake.init(hardwareMap);

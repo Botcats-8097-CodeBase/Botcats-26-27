@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 public class PIDController {
     //PID coefficients
-    double Kp, Ki, Kd, maxIntegral;
-    double lastError, integralSum = 0;
-    double output = 0;
-    boolean initialized = false;
+    private final double Kp, Ki, Kd, maxIntegral;
+    private double lastError, integralSum = 0;
+    private double output = 0;
+    private boolean initialized = false;
 
     //set object attributes to instance
     public PIDController(double Kp, double Ki, double Kd, double maxIntegral) {
@@ -19,7 +17,8 @@ public class PIDController {
 
     //performs PID math, returns desired number
     public double update(double error, double dt) {
-        if (dt <= 0) return output;
+        if (dt < 0.001) return output;
+
         if (!initialized) {
             lastError = error;
             initialized = true;
@@ -40,7 +39,7 @@ public class PIDController {
         return output;
     }
 
-    public double output() {
+    public double getOutput() {
         return output;
     }
 

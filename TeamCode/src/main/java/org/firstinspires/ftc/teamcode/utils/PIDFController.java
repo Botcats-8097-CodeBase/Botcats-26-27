@@ -2,44 +2,31 @@ package org.firstinspires.ftc.teamcode.utils;
 
 public class PIDFController {
     //PIDF coefficients
-    double Kv;
-    double output = 0;
-    boolean initialized = false;
-    double targetVel = 0;
-    PIDController velocityPID;
-
-
+    private final double kF;
+    private double setpoint = 0;
+    private final PIDController pid;
 
     //set object attributes to instance
-    public PIDFController(double Kp, double Ki, double Kd, double Kv, double maxIntegral) {
-        velocityPID = new PIDController(Kp, Ki, Kd, maxIntegral);
-        this.Kv = Kv;
+    public PIDFController(double Kp, double Ki, double Kd, double kF, double maxIntegral) {
+        pid = new PIDController(Kp, Ki, Kd, maxIntegral);
+        this.kF = kF;
     }
 
-    //todo: use velocity motor class to calculate velocity error with data filter
-    public double update(double error, double dt) {
-//        if (dt <= 0) return output;
-//        if (!initialized) {
-//            initialized = true;
-//        }
-
-        double correction = velocityPID.update(error, dt);
-
-        // feedforward + PID
-        double output = Kv * targetVel + correction;
-        return output;
+    // feedforward + PID
+    public double update(double measurement, double dt) {
+        double error = setpoint - measurement;
+        return kF * setpoint + pid.update(error, dt);
     }
 
-    public void setTargetVelocity(double target) {
-        targetVel = target;
+    public void setSetpoint(double target) {
+        setpoint = target;
     }
 
-    public double getTargetVelocity() {
-        return targetVel;
+    public double getSetpoint() {
+        return setpoint;
     }
 
     public void reset() {
-        output = 0;
-        initialized = false;
+        pid.reset();
     }
 }

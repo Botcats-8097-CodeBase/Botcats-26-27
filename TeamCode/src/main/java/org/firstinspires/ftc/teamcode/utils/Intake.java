@@ -11,13 +11,14 @@ public class Intake {
 
     public Intake() {}
 
-    public void init(HardwareMap hardwareMap){
+    public void init(HardwareMap hardwareMap) {
         intakeMotor = hardwareMap.get(DcMotor.class, RobotConstants.intake);
         intakeMotor.setDirection(RobotConstants.intakeDirection);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ticksPerRev = intakeMotor.getMotorType().getTicksPerRev();
     }
-    public void setIntakeMotor(double speed){
+
+    public void setIntakeMotor(double speed) {
         double power = speed;
         intakeMotor.setPower(power);
     }
