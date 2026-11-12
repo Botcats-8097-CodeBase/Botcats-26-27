@@ -4,9 +4,9 @@ package org.firstinspires.ftc.teamcode.testing;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.utils.Intake;
+import org.firstinspires.ftc.teamcode.subcomponents.Intake;
 
-@TeleOp (name = "Intake Motor Test")
+@TeleOp (name = "Intake Motor Test", group = "Testing")
 public class IntakeMotorTest extends OpMode {
     Intake intake = new Intake();
 

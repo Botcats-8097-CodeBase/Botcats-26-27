@@ -22,8 +22,6 @@ public class VelocityMotor {
         this.velFilter = new LowPassFilter(alpha);
     }
 
-
-
     //init protocol
     public void init(HardwareMap hardwareMap, String name, DcMotorSimple.Direction direction) {
         motor = hardwareMap.get(DcMotor.class, name);

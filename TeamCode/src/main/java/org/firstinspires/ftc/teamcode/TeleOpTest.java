@@ -6,15 +6,15 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.utils.BasicRobot;
-import org.firstinspires.ftc.teamcode.utils.Intake;
+import org.firstinspires.ftc.teamcode.subcomponents.BasicRobot;
+import org.firstinspires.ftc.teamcode.subcomponents.Blocker;
+import org.firstinspires.ftc.teamcode.subcomponents.Intake;
+import org.firstinspires.ftc.teamcode.subcomponents.Shooter;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.utils.VelocityMotor;
 
 import java.util.List;
 
-@TeleOp (name = "TeleOpTest")
+@TeleOp (name = "TeleOpTest", group = "Testing")
 public class TeleOpTest extends OpMode {
 
     List<LynxModule> allHubs;
@@ -115,7 +115,7 @@ public class TeleOpTest extends OpMode {
         wasShooting = gamepad1.a;
         shooter.update();
 
-        pTelemetry.addData("imu", imu);
+        pTelemetry.addData("imu yaw", yaw);
         pTelemetry.addData("targVel", shooter.getTargetVelocity());
         pTelemetry.addData("currentVel", shooter.getCurrVel());
         pTelemetry.addData("intakeSpeed", intakeSpeed);
