@@ -117,6 +117,7 @@ public class TeleOpTest extends OpMode {
         wasShooting = gamepad1.a;
         shooter.update();
 
+        pTelemetry.addData("imu", imu);
         pTelemetry.addData("targVel", shooter.getTargetVelocity());
         pTelemetry.addData("currentVel", shooter.getCurrVel());
         pTelemetry.addData("intakeSpeed", intakeSpeed);
