@@ -94,18 +94,16 @@ public class TeleOpTest extends OpMode {
         double yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
         robot.drivePower(new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw-yawOffset)), gamepad1.right_stick_x, coefficient);
 
-        if (gamepad1.dpadUpWasPressed()) {
-            intakeSpeed += 0.1;
-        }
-        if (gamepad1.dpadDownWasPressed()) {
-            intakeSpeed -= 0.1;
-        }
         if (gamepad1.right_bumper) {
-            intake.setIntakeMotor(intakeSpeed);
+            intakeSpeed = 1;
+        }
+        else if (gamepad1.left_bumper) {
+            intakeSpeed = -1;
         }
         else {
-            intake.setIntakeMotor(0);
+            intakeSpeed = 0;
         }
+        intake.setIntakeMotor(intakeSpeed);
 
         //set shooter
         if (gamepad1.a) {
