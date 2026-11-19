@@ -12,11 +12,11 @@ public class Shooter {
         IDLE, SPINNING_UP, READY, FIRING
     }
     public enum Mode {
-        ALWAYS_ON, HOLDING_SPIN
+        READY_SHOOT, HOLD_TO_SPIN
     }
 
     private State state = State.IDLE;
-    private Mode mode = Mode.HOLDING_SPIN;
+    private Mode mode = Mode.HOLD_TO_SPIN;
 
     private final VelocityMotor flywheel;
     private final Blocker blocker;
@@ -27,7 +27,14 @@ public class Shooter {
     private boolean fireRequest = false;
     private boolean intakeRequest = false;
 
-    private static final double INTAKE_POWER = 1;
+    public enum Direction {
+        FORWARD,
+        REVERSE
+    }
+
+    private Direction direction = Direction.FORWARD;
+
+    private static final double INTAKE_POWER = 1.0;
 
     public Shooter(VelocityMotor flywheel, Blocker blocker, Intake intake) {
         this.flywheel = flywheel;
@@ -58,8 +65,17 @@ public class Shooter {
         fireRequest = firing;
     }
 
-    public void setIntake(boolean running) {
-        intakeRequest = running;
+    public void setIntake(boolean button1, boolean button2) {
+        intakeRequest = button1 || button2;
+        if (button1) {
+            direction = Direction.FORWARD;
+        }
+        else if (button2) {
+            direction = Direction.REVERSE;
+        }
+        else {
+            direction = Direction.FORWARD;
+        }
     }
 
     public void stop() {
@@ -85,7 +101,7 @@ public class Shooter {
     public void control(double velocity, boolean aHeld) {
         setFire(aHeld);
 
-        if (mode == Mode.ALWAYS_ON) {
+        if (mode == Mode.READY_SHOOT) {
             spinUp(velocity);
         }
         else {
@@ -101,6 +117,7 @@ public class Shooter {
     public void update() {
         switch (state) {
             case IDLE:
+                flywheel.update();
                 break;
 
             case SPINNING_UP:
@@ -134,20 +151,22 @@ public class Shooter {
         boolean firing = state == State.FIRING;
 
         blocker.setPosition(firing ? RobotConstants.BLOCKER_OPEN : RobotConstants.BLOCKER_CLOSED);
-        intake.setIntakeMotor((intakeRequest || firing) ? INTAKE_POWER : 0);
+        intake.setIntakeMotor(
+                (intakeRequest || firing)
+                ? (direction == Direction.FORWARD ? INTAKE_POWER : -INTAKE_POWER)
+                        : 0
+        );
     }
 
-    public void toggleMode() {
-        if (mode == Mode.ALWAYS_ON) {
-            mode = Mode.HOLDING_SPIN;
+    public void toggleMode(boolean wasPressed) {
+        if (wasPressed) {
+            if (mode == Mode.READY_SHOOT) {
+                mode = Mode.HOLD_TO_SPIN;
+            }
+            else {
+                mode = Mode.READY_SHOOT;
+            }
         }
-        else {
-            mode = Mode.ALWAYS_ON;
-        }
-    }
-
-    public Mode getMode() {
-        return mode;
     }
 
     private boolean atTargVel() {
@@ -157,5 +176,21 @@ public class Shooter {
 
     public State getState() {
         return state;
+    }
+
+    public Mode getMode() {
+        return mode;
+    }
+
+    public double getVelocity() {
+        return flywheel.getCurrVel();
+    }
+
+    public double getTargVel() {
+        return flywheel.getTargetVelocity();
+    }
+
+    public double getAppliedPower() {
+        return flywheel.getAppliedPower();
     }
 }

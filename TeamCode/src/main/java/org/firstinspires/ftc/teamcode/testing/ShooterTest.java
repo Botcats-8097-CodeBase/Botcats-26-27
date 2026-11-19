@@ -62,12 +62,10 @@ public class ShooterTest extends LinearOpMode {
             double dt = elapsedTime.seconds();
             elapsedTime.reset();
 
-            if (gamepad1.backWasPressed()) {
-                shooter.toggleMode();
-            }
+            shooter.toggleMode(gamepad1.backWasPressed());
 
             shooter.control(2500, gamepad1.a);
-            shooter.setIntake(gamepad1.right_bumper);
+            shooter.setIntake(gamepad1.right_bumper, gamepad1.left_bumper);
             shooter.update();
 
             pTelemetry.addData("Mode", shooter.getMode());

@@ -18,7 +18,7 @@ public class RobotConstants {
     public static String pollenSpinnerName = "pollenSpinner";
     public static DcMotorSimple.Direction pollenSpinnerDirection = DcMotorSimple.Direction.FORWARD;
 
-    public static PIDFController tunedController = new PIDFController(0.001, 0, 0, 0.000397, 0);
+    public static PIDFController tunedController = new PIDFController(0.01, 0, 0, 0.000392, 0);
     public static double dataFilterValue = 0.3;
 
     //---------//

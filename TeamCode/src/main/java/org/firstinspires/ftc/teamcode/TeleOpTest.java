@@ -32,11 +32,11 @@ public class TeleOpTest extends OpMode {
     ElapsedTime et = new ElapsedTime();
 
     BasicRobot robot = new BasicRobot();
-    VelocityMotor shooter = new VelocityMotor(
-            new PIDFController(0.001, 0, 0, 0.000397, 0),
-            0.3);
-
-    Intake intake = new Intake();
+    Shooter shooter = new Shooter(
+            new VelocityMotor(RobotConstants.tunedController, RobotConstants.dataFilterValue),
+            new Blocker(),
+            new Intake()
+    );
 
     public IMU imu;
 
@@ -92,32 +92,22 @@ public class TeleOpTest extends OpMode {
         //retrieve robot yaw and control robot w/ joysticks
         YawPitchRollAngles robotOrientation = imu.getRobotYawPitchRollAngles();
         double yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
-        robot.drivePower(new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw-yawOffset)), gamepad1.right_stick_x, coefficient);
-
-        if (gamepad1.right_bumper) {
-            intakeSpeed = 1;
-        }
-        else if (gamepad1.left_bumper) {
-            intakeSpeed = -1;
-        }
-        else {
-            intakeSpeed = 0;
-        }
-        intake.setIntakeMotor(intakeSpeed);
+        robot.drivePower(
+                new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw - yawOffset)),
+                gamepad1.right_stick_x,
+                coefficient);
 
         //set shooter
-        if (gamepad1.a) {
-            shooter.setTargetVelocity(targVel);
-        }
-        else if (wasShooting) {
-            shooter.stop();
-        }
-        wasShooting = gamepad1.a;
+        shooter.toggleMode(gamepad1.backWasPressed());
+        shooter.control(2500, gamepad1.a);
+        shooter.setIntake(gamepad1.right_bumper, gamepad1.left_bumper);
         shooter.update();
 
         pTelemetry.addData("imu yaw", yaw);
-        pTelemetry.addData("targVel", shooter.getTargetVelocity());
-        pTelemetry.addData("currentVel", shooter.getCurrVel());
+        pTelemetry.addData("shooter mode", shooter.getMode());
+        pTelemetry.addData("shooter state", shooter.getState());
+        pTelemetry.addData("targVel", shooter.getTargVel());
+        pTelemetry.addData("currentVel", shooter.getVelocity());
         pTelemetry.addData("intakeSpeed", intakeSpeed);
         pTelemetry.addData("shooterPower", shooter.getAppliedPower());
 
@@ -136,8 +126,11 @@ public class TeleOpTest extends OpMode {
 
         //class init
         robot.init(hardwareMap);
-        intake.init(hardwareMap);
-        shooter.init(hardwareMap, RobotConstants.pollenSpinnerName, RobotConstants.pollenSpinnerDirection);
+        shooter.init(
+                hardwareMap,
+                RobotConstants.pollenSpinnerName,
+                RobotConstants.pollenSpinnerDirection
+        );
     }
 
     @Override
