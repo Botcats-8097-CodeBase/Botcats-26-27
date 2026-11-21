@@ -38,10 +38,10 @@ public class BlockerTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (gamepad1.a) {
-                servoPos += 0.01;
+                servoPos += 0.0025;
             }
             if (gamepad1.b) {
-                servoPos -= 0.01;
+                servoPos -= 0.0025;
             }
 
             if (servoPos < 0) {
@@ -51,6 +51,8 @@ public class BlockerTest extends LinearOpMode {
                 servoPos = 1;
             }
             blocker.setPosition(servoPos);
+            pTelemetry.addData("servopos", servoPos);
+            pTelemetry.update();
         }
     }
 }

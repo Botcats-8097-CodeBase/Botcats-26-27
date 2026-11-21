@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.subcomponents.BasicRobot;
 import org.firstinspires.ftc.teamcode.subcomponents.Blocker;
 import org.firstinspires.ftc.teamcode.subcomponents.Intake;
+import org.firstinspires.ftc.teamcode.subcomponents.Odometry;
 import org.firstinspires.ftc.teamcode.subcomponents.Shooter;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
@@ -46,15 +47,20 @@ public class TeleOpTest extends OpMode {
                     RevHubOrientationOnRobot.UsbFacingDirection.UP
             )
     );
+    Odometry odometry = new Odometry();
 
 
     double yawOffset = 90;
     double coefficient;
 
     double intakeSpeed = 0;
-    double targVel = 2500;
+    double targVel = 2850;
 
-    boolean wasShooting = false;
+    public enum YawTrack {
+        ODO, IMU
+    }
+
+    YawTrack yawTrack = YawTrack.ODO;
 
     @Override
     public void init() {
@@ -85,13 +91,22 @@ public class TeleOpTest extends OpMode {
 
         //reset imu
         if (gamepad1.y) {
+            odometry.resetHeading(0);
+
             imu.resetYaw();
             imu.initialize(parameters);
         }
 
+
+        double yaw;
         //retrieve robot yaw and control robot w/ joysticks
-        YawPitchRollAngles robotOrientation = imu.getRobotYawPitchRollAngles();
-        double yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
+        if (yawTrack == YawTrack.IMU) {
+            YawPitchRollAngles robotOrientation = imu.getRobotYawPitchRollAngles();
+            yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
+        }
+        else {
+            yaw = odometry.getYaw();
+        }
         robot.drivePower(
                 new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw - yawOffset)),
                 gamepad1.right_stick_x,
@@ -99,11 +114,12 @@ public class TeleOpTest extends OpMode {
 
         //set shooter
         shooter.toggleMode(gamepad1.backWasPressed());
-        shooter.control(2500, gamepad1.a);
+        shooter.control(2450, gamepad1.a);
         shooter.setIntake(gamepad1.right_bumper, gamepad1.left_bumper);
         shooter.update();
 
-        pTelemetry.addData("imu yaw", yaw);
+        pTelemetry.addData("yaw mode", yawTrack);
+        pTelemetry.addData("yaw", yaw);
         pTelemetry.addData("shooter mode", shooter.getMode());
         pTelemetry.addData("shooter state", shooter.getState());
         pTelemetry.addData("targVel", shooter.getTargVel());
@@ -123,6 +139,7 @@ public class TeleOpTest extends OpMode {
         }
 
         imu = hardwareMap.get(IMU.class, "imu");
+        odometry.init(hardwareMap);
 
         //class init
         robot.init(hardwareMap);
