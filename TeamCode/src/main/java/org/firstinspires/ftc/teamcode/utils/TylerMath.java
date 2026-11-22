@@ -18,4 +18,10 @@ public class TylerMath {
     public static double clamp(double input, double lower, double upper) {
         return Math.max(lower, Math.min(upper, input));
     }
+
+//    public static double distanceTo(double x1, double y1, double x2, double y2) {
+//        return Math.sqrt(
+//                (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+//        );
+//    }
 }

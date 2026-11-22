@@ -102,24 +102,26 @@ public class TeleOpTest extends OpMode {
                     TylerMath.wrap(((double) blackboard.get("heading")), -180, 180));
         } else {
             if (!isRed) {
-                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 63.5, -8.5, AngleUnit.DEGREES, 180);
-                else initPose = new Pose2D(DistanceUnit.INCH, -57.3, -45, AngleUnit.DEGREES, 225);
+                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 84, 7.5, AngleUnit.DEGREES, 90);
+                else initPose = new Pose2D(DistanceUnit.INCH, 89.5, 136.5, AngleUnit.DEGREES, 270);
 
 
             } else {
-                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-                else initPose = new Pose2D(DistanceUnit.INCH, -63.5, 8.5, AngleUnit.DEGREES, 180);
+                //18/2,15.5/2,0
+                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 54.5, 7.5, AngleUnit.DEGREES, 90);
+                else initPose = new Pose2D(DistanceUnit.INCH, 60, 136.5, AngleUnit.DEGREES, 270);
             }
         }
 
         targ1 = isRed ? 35 : 40;
         targ2 = isRed ? 32 : 43;
         shooter.setTargets(targ1, targ2);
+        odometry.setPose(initPose);
 
         if (!isRed) {
-            yawOffset = -90;
+            yawOffset = -180;
         } else {
-            yawOffset = 90;
+            yawOffset = 0;
         }
     }
 
@@ -176,8 +178,9 @@ public class TeleOpTest extends OpMode {
 
         robot.drivePower(move, rotation, coefficient);
 
-        pTelemetry.addData("tagDist1", limelight.tagDistance(targ1));
-        pTelemetry.addData("tagDist2", limelight.tagDistance(targ2));
+        pTelemetry.addData("goalDist", shooter.goalDist(isRed));
+        pTelemetry.addData("x", odometry.getPose().x());
+        pTelemetry.addData("y", odometry.getPose().y());
         pTelemetry.addData("yaw mode", yawTrack);
         pTelemetry.addData("yaw", yaw);
         pTelemetry.addData("shooter mode", shooter.getMode());

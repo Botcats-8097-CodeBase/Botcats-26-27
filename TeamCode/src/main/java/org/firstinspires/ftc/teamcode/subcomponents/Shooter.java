@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subcomponents;
 
+import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -33,6 +34,9 @@ public class Shooter {
     private final Intake intake;
     private final Limelight limelight;
     private final Odometry odometry;
+
+    private final Pose redGoal = new Pose(60, 72);
+    private final Pose blueGoal = new Pose(84, 72);
 
     private double targVel = 0;
     private double camError;
@@ -73,6 +77,11 @@ public class Shooter {
     public void setTargets(int targ1, int targ2) {
         this.targ1 = targ1;
         this.targ2 = targ2;
+    }
+
+    public double goalDist(boolean isRed) {
+        if (isRed) return odometry.distanceTo(redGoal);
+        return odometry.distanceTo(blueGoal);
     }
 
     public void spinUp(double velocity) {
