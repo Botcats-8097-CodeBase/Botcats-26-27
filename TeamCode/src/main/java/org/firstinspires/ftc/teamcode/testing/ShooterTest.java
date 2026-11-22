@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.testing;
 import com.bylazar.telemetry.JoinedTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,7 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subcomponents.Blocker;
 import org.firstinspires.ftc.teamcode.subcomponents.Intake;
+import org.firstinspires.ftc.teamcode.subcomponents.Odometry;
 import org.firstinspires.ftc.teamcode.subcomponents.Shooter;
+import org.firstinspires.ftc.teamcode.utils.Limelight;
 import org.firstinspires.ftc.teamcode.utils.LowPassFilter;
 import org.firstinspires.ftc.teamcode.utils.PIDController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
@@ -19,6 +22,7 @@ import org.firstinspires.ftc.teamcode.utils.VelocityMotor;
 
 import java.util.List;
 
+@Disabled
 @TeleOp (name = "shooterTest", group = "Testing")
 public class ShooterTest extends LinearOpMode {
 
@@ -27,14 +31,19 @@ public class ShooterTest extends LinearOpMode {
     ElapsedTime elapsedTime = new ElapsedTime();
     JoinedTelemetry pTelemetry = new JoinedTelemetry(telemetry,
             PanelsTelemetry.INSTANCE.getFtcTelemetry());
+    Odometry odometry = new Odometry();
 
+    private Limelight limelight;
     Shooter shooter = new Shooter(
             new VelocityMotor(
                     RobotConstants.tunedController,
                     RobotConstants.dataFilterValue
             ),
             new Blocker(),
-            new Intake()
+            new Intake(),
+            4,
+            odometry,
+            limelight
     );
 
     @Override
@@ -48,7 +57,8 @@ public class ShooterTest extends LinearOpMode {
         shooter.init(
                 hardwareMap,
                 RobotConstants.pollenSpinnerName,
-                RobotConstants.pollenSpinnerDirection
+                RobotConstants.pollenSpinnerDirection,
+                1, 2
         );
 
         waitForStart();

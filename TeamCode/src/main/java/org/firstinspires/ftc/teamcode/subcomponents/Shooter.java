@@ -2,9 +2,16 @@ package org.firstinspires.ftc.teamcode.subcomponents;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.utils.Limelight;
+import org.firstinspires.ftc.teamcode.utils.PIDController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
+import org.firstinspires.ftc.teamcode.utils.TylerMath;
 import org.firstinspires.ftc.teamcode.utils.VelocityMotor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagCanvasAnnotator;
+
+import javax.xml.transform.dom.DOMLocator;
 
 public class Shooter {
 
@@ -18,13 +25,22 @@ public class Shooter {
     private State state = State.IDLE;
     private Mode mode = Mode.HOLD_TO_SPIN;
 
+    private ElapsedTime dt = new ElapsedTime();
+
+    private final PIDController turnToPID = RobotConstants.turnToGoalController;
     private final VelocityMotor flywheel;
     private final Blocker blocker;
     private final Intake intake;
+    private final Limelight limelight;
+    private final Odometry odometry;
 
     private double targVel = 0;
+    private double camError;
 
-    private boolean fireRequest = false;
+    private int targ1;
+    private int targ2;
+
+    public boolean fireRequest = false;
     private boolean intakeRequest = false;
 
     public enum Direction {
@@ -36,16 +52,27 @@ public class Shooter {
 
     private static final double INTAKE_POWER = 1.0;
 
-    public Shooter(VelocityMotor flywheel, Blocker blocker, Intake intake) {
+    public Shooter(VelocityMotor flywheel, Blocker blocker, Intake intake, double camError, Odometry odometry, Limelight limelight) {
         this.flywheel = flywheel;
         this.blocker = blocker;
         this.intake = intake;
+        this.camError = camError;
+        this.odometry = odometry;
+        this.limelight = limelight;
     }
 
-    public void init(HardwareMap hardwareMap, String name, DcMotorSimple.Direction direction) {
+    public void init(HardwareMap hardwareMap, String name, DcMotorSimple.Direction direction, int targ1, int targ2) {
         flywheel.init(hardwareMap, name, direction);
         blocker.init(hardwareMap);
         intake.init(hardwareMap);
+        limelight.init(hardwareMap);
+        this.targ1 = targ1;
+        this.targ2 = targ2;
+    }
+
+    public void setTargets(int targ1, int targ2) {
+        this.targ1 = targ1;
+        this.targ2 = targ2;
     }
 
     public void spinUp(double velocity) {
@@ -107,11 +134,38 @@ public class Shooter {
         else {
             if (aHeld) {
                 spinUp(velocity);
+
             }
             else if (state != State.IDLE) {
                 stopFlywheel();
             }
         }
+    }
+
+    public double aim(boolean closeOrFar) {
+        double targX = getTx(closeOrFar);
+
+        if (!Double.isFinite(targX)) {
+            resetAim();
+            return 0;
+        }
+
+        double elapsed = Math.max(dt.seconds(), 0.001);
+        dt.reset();
+
+        return TylerMath.clamp(turnToPID.update(targX, elapsed), -1, 1);
+    }
+
+    public boolean shouldAim() {
+        return fireRequest &&
+                (state == State.SPINNING_UP ||
+                        state == State.READY ||
+                        state == State.FIRING);
+    }
+
+    public void resetAim() {
+        turnToPID.reset();
+        dt.reset();
     }
 
     public void update() {
@@ -123,7 +177,8 @@ public class Shooter {
             case SPINNING_UP:
                 flywheel.update();
 
-                if (atTargVel()) {
+                if (atTargVel() && aimedAtTarg(odometry.side(), camError)) {
+
                     state = State.READY;
                 }
                 break;
@@ -174,6 +229,17 @@ public class Shooter {
         return Math.abs(flywheel.getCurrVel() - targVel) <= errorBounds;
     }
 
+    private boolean aimedAtTarg(boolean closeOrFar, double errorBounds) {
+        if (!closeOrFar) {
+            return Math.abs(limelight.limeScanPosX(targ1)) <= errorBounds;
+        }
+        else if (closeOrFar) {
+            return Math.abs(limelight.limeScanPosX(targ2)) <= errorBounds;
+        }
+
+        return false;
+    }
+
     public State getState() {
         return state;
     }
@@ -192,5 +258,14 @@ public class Shooter {
 
     public double getAppliedPower() {
         return flywheel.getAppliedPower();
+    }
+
+    public double getTx(boolean closeOrFar) {
+        if (!closeOrFar) {
+            return limelight.limeScanPosX(targ1);
+        } else if (closeOrFar) {
+            return limelight.limeScanPosX(targ2);
+        }
+        return Double.NaN;
     }
 }

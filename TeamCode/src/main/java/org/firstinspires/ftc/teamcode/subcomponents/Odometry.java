@@ -21,4 +21,9 @@ public class Odometry {
     public void resetHeading(double heading) {
         follower.setHeading(heading);
     }
+
+    public boolean side() {
+        follower.update();
+        return follower.pose().x() > 70;
+    }
 }

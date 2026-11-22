@@ -10,14 +10,18 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.subcomponents.BasicRobot;
 import org.firstinspires.ftc.teamcode.subcomponents.Blocker;
 import org.firstinspires.ftc.teamcode.subcomponents.Intake;
 import org.firstinspires.ftc.teamcode.subcomponents.Odometry;
 import org.firstinspires.ftc.teamcode.subcomponents.Shooter;
+import org.firstinspires.ftc.teamcode.utils.Limelight;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
+import org.firstinspires.ftc.teamcode.utils.TylerMath;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.teamcode.utils.VelocityMotor;
 
@@ -31,12 +35,19 @@ public class TeleOpTest extends OpMode {
     JoinedTelemetry pTelemetry = new JoinedTelemetry(telemetry, PanelsTelemetry.INSTANCE.getFtcTelemetry());
 
     ElapsedTime et = new ElapsedTime();
+    Pose2D initPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+
+    Odometry odometry = new Odometry();
+    Limelight limelight = new Limelight();
 
     BasicRobot robot = new BasicRobot();
     Shooter shooter = new Shooter(
             new VelocityMotor(RobotConstants.tunedController, RobotConstants.dataFilterValue),
             new Blocker(),
-            new Intake()
+            new Intake(),
+            1.5,
+            odometry,
+            limelight
     );
 
     public IMU imu;
@@ -47,14 +58,22 @@ public class TeleOpTest extends OpMode {
                     RevHubOrientationOnRobot.UsbFacingDirection.UP
             )
     );
-    Odometry odometry = new Odometry();
-
 
     double yawOffset = 90;
     double coefficient;
 
     double intakeSpeed = 0;
     double targVel = 2850;
+
+    int targ1;
+    int targ2;
+
+    String[] color = {"blue", "red"};
+
+    boolean isBlackBoardPos = true;
+    boolean isRed = false;
+    boolean isClose =true;
+
 
     public enum YawTrack {
         ODO, IMU
@@ -72,6 +91,36 @@ public class TeleOpTest extends OpMode {
         super.start();
         et.reset();
 
+
+
+        if (isBlackBoardPos && blackboard.get("x") != null && blackboard.get("y") != null && blackboard.get("heading") != null && blackboard.get("yawPos") != null) {
+            initPose = new Pose2D(
+                    DistanceUnit.INCH,
+                    (double) blackboard.get("x"),
+                    (double) blackboard.get("y"),
+                    AngleUnit.DEGREES,
+                    TylerMath.wrap(((double) blackboard.get("heading")), -180, 180));
+        } else {
+            if (!isRed) {
+                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 63.5, -8.5, AngleUnit.DEGREES, 180);
+                else initPose = new Pose2D(DistanceUnit.INCH, -57.3, -45, AngleUnit.DEGREES, 225);
+
+
+            } else {
+                if (isClose) initPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+                else initPose = new Pose2D(DistanceUnit.INCH, -63.5, 8.5, AngleUnit.DEGREES, 180);
+            }
+        }
+
+        targ1 = isRed ? 35 : 40;
+        targ2 = isRed ? 32 : 43;
+        shooter.setTargets(targ1, targ2);
+
+        if (!isRed) {
+            yawOffset = -90;
+        } else {
+            yawOffset = 90;
+        }
     }
 
     @Override
@@ -107,23 +156,37 @@ public class TeleOpTest extends OpMode {
         else {
             yaw = odometry.getYaw();
         }
-        robot.drivePower(
-                new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw - yawOffset)),
-                gamepad1.right_stick_x,
-                coefficient);
 
+        Vector2D move = new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw - yawOffset));
         //set shooter
         shooter.toggleMode(gamepad1.backWasPressed());
         shooter.control(2450, gamepad1.a);
+
+        double rotation = gamepad1.right_stick_x;
+
+        if (shooter.shouldAim()) {
+            rotation = shooter.aim(odometry.side());
+        }
+        else {
+            shooter.resetAim();
+        }
+
         shooter.setIntake(gamepad1.right_bumper, gamepad1.left_bumper);
         shooter.update();
 
+        robot.drivePower(move, rotation, coefficient);
+
+        pTelemetry.addData("tagDist1", limelight.tagDistance(targ1));
+        pTelemetry.addData("tagDist2", limelight.tagDistance(targ2));
         pTelemetry.addData("yaw mode", yawTrack);
         pTelemetry.addData("yaw", yaw);
         pTelemetry.addData("shooter mode", shooter.getMode());
         pTelemetry.addData("shooter state", shooter.getState());
         pTelemetry.addData("targVel", shooter.getTargVel());
         pTelemetry.addData("currentVel", shooter.getVelocity());
+        pTelemetry.addData("targClose", targ1);
+        pTelemetry.addData("targFar", targ2);
+        pTelemetry.addData("tx", shooter.getTx(odometry.side()));
         pTelemetry.addData("intakeSpeed", intakeSpeed);
         pTelemetry.addData("shooterPower", shooter.getAppliedPower());
 
@@ -146,12 +209,29 @@ public class TeleOpTest extends OpMode {
         shooter.init(
                 hardwareMap,
                 RobotConstants.pollenSpinnerName,
-                RobotConstants.pollenSpinnerDirection
+                RobotConstants.pollenSpinnerDirection,
+                targ1, targ2
         );
     }
 
     @Override
     public void init_loop() {
         //blackboard + side switching
+        int colorNum = isRed ? 1 : 0;
+
+
+        pTelemetry.addData("team", color[colorNum]);
+        pTelemetry.addData("is close", isClose);
+        pTelemetry.addData("is black board pos", isBlackBoardPos);
+        pTelemetry.addData("x", blackboard.get("x"));
+        pTelemetry.addData("y", blackboard.get("y"));
+        pTelemetry.addData("heading", blackboard.get("heading"));
+        pTelemetry.addData("turret heading", blackboard.get("yawPos"));
+
+        if (gamepad1.aWasPressed()) isRed = !isRed;
+        if (gamepad1.bWasPressed()) isClose = !isClose;
+        if (gamepad1.xWasPressed()) isBlackBoardPos = !isBlackBoardPos;
+
+        pTelemetry.update();
     }
 }

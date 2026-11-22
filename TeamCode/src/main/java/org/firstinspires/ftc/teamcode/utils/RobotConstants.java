@@ -18,8 +18,10 @@ public class RobotConstants {
     public static String pollenSpinnerName = "pollenSpinner";
     public static DcMotorSimple.Direction pollenSpinnerDirection = DcMotorSimple.Direction.FORWARD;
 
-    public static PIDFController tunedController = new PIDFController(0.2, 0, 0.00001, 0.000392, 0);
+    public static PIDFController tunedController = new PIDFController(0.1, 0, 0.000001, 0.000392, 0);
     public static double dataFilterValue = 0.3;
+
+    public static PIDController turnToGoalController = new PIDController(0.045, 0, 0.0005, 0);
 
     //---------//
 
@@ -27,6 +29,6 @@ public class RobotConstants {
     public static DcMotorSimple.Direction intakeDirection = DcMotorSimple.Direction.REVERSE;
 
     public static String blockerName = "blockerName";
-    public static double BLOCKER_OPEN = 0.46;
-    public static double BLOCKER_CLOSED = 0.68;
+    public static double BLOCKER_OPEN = 0.6425;
+    public static double BLOCKER_CLOSED = 0.42;
 }
