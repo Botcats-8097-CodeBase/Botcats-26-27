@@ -1,0 +1,27 @@
+package org.firstinspires.ftc.teamcode.utils;
+
+public class TylerMath {
+    public static double normalize180(double theta) {
+        return wrap(theta, -180, 180);
+    }
+
+    public static double normalize360(double theta) {
+        return wrap(theta, 0, 360);
+    }
+
+    // An expanded modulo that includes a range and negative numbers.
+    public static double wrap(double a, double min, double max) {
+        double d = max - min;
+        return (((((a - min) % d) + d) % d) + min);
+    }
+
+    public static double clamp(double input, double lower, double upper) {
+        return Math.max(lower, Math.min(upper, input));
+    }
+
+//    public static double distanceTo(double x1, double y1, double x2, double y2) {
+//        return Math.sqrt(
+//                (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+//        );
+//    }
+}
