@@ -11,6 +11,7 @@ import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 
+import com.pedropathing.paths.interpolator.Interpolator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,24 +22,24 @@ import org.firstinspires.ftc.teamcode.subcomponents.Intake;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
 import org.firstinspires.ftc.teamcode.utils.VelocityMotor;
 
-@Autonomous(name = "Preshoot", group = "Autonomous")
-public class Preshoot extends LinearOpMode {
+@Autonomous(name = "Preshoot Blue", group = "Autonomous")
+public class PreshootBlue extends LinearOpMode {
 
     private Follower follower;
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start =
-            poseFactory.of(54.5, 7.5, 90);
+            poseFactory.of(144 - 54.5, 144 - 7.5, -90);
 
     private final Pose path1 =
-            poseFactory.of(12.1395, 95.6939, 0);
+            poseFactory.of(144 - 12.1395, 144 - 95.6939 + 4, 0);
 
     private final Pose path1Control1 =
-            poseFactory.of(2.5663, 14.9063, 0);
+            poseFactory.of(144 - 2.5663, 144 - 14.9063, 0);
 
     private final Pose path1Control2 =
-            poseFactory.of(32.5866, 85.8278, 0);
+            poseFactory.of(144 - 32.5866, 144 - 85.8278, 0);
 
     // Shooter hardware
     private final VelocityMotor flywheel = new VelocityMotor(
@@ -216,14 +217,23 @@ public class Preshoot extends LinearOpMode {
     }
 
     // Parking path
+//    public Path path1() {
+//        return Paths.curve(
+//                start,
+//                path1Control1,
+//                path1Control2,
+//                path1
+//        ).heading(Interpolator.constant(Math.toRadians(90)));
+//    }
+
     public Path path1() {
-        return Paths.curve(
-                start,
-                path1Control1,
-                path1Control2,
-                path1
-        );
-    }
+            return Paths.curve(
+                    start,
+                    path1Control1,
+                    path1Control2,
+                    path1
+            ).linear(start, path1);
+        }
 
     private void savePoseToBlackboard() {
         Pose pose = follower.pose();

@@ -186,7 +186,8 @@ public class Shooter {
             case SPINNING_UP:
                 flywheel.update();
 
-                if (atTargVel() && aimedAtTarg(odometry.side(), camError)) {
+                // && aimedAtTarg(odometry.side(), camError)
+                if (atTargVel()) {
 
                     state = State.READY;
                 }

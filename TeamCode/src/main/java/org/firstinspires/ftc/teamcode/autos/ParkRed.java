@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@Autonomous(name = "AutoPath", group = "Autonomous")
+@Autonomous(name = "ParkRed", group = "Autonomous")
 public class ParkRed extends LinearOpMode {
 
     private Follower follower;
@@ -48,6 +48,8 @@ public class ParkRed extends LinearOpMode {
             follower.update();
             Scheduler.execute();
 
+            savePoseToBlackboard();
+
             telemetry.addData("x", follower.pose().x());
             telemetry.addData("y", follower.pose().y());
             telemetry.addData("heading", follower.pose().heading());
@@ -63,5 +65,14 @@ public class ParkRed extends LinearOpMode {
 
     public Path path1() {
         return Paths.curve(start, path1Control1, path1).linear(start, path1);
+    }
+
+    private void savePoseToBlackboard() {
+        Pose pose = follower.pose();
+
+        blackboard.put("x", pose.x());
+        blackboard.put("y", pose.y());
+        blackboard.put("heading", Math.toDegrees(pose.heading()));
+        blackboard.put("yawPos", 0.0);
     }
 }

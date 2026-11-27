@@ -29,6 +29,6 @@ public class RobotConstants {
     public static DcMotorSimple.Direction intakeDirection = DcMotorSimple.Direction.REVERSE;
 
     public static String blockerName = "blockerName";
-    public static double BLOCKER_OPEN = 0.6425;
-    public static double BLOCKER_CLOSED = 0.42;
+    public static double BLOCKER_OPEN = 0.675;
+    public static double BLOCKER_CLOSED = 0.45;
 }
