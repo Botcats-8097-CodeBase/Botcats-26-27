@@ -33,7 +33,7 @@ public class VelocityMotor {
         reset();
     }
 
-    //update motor
+    //updateControl motor
     public void update() {
         double dt = elapsedTime.seconds();
         if (dt < 0.001) return;

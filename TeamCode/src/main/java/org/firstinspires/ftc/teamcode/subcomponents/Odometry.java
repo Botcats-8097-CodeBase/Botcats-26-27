@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subcomponents;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -43,5 +44,19 @@ public class Odometry {
     public void setPose(Pose2D pose) {
         follower.setPose(new Pose(pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH)));
         follower.setHeading(pose.getHeading(AngleUnit.RADIANS));
+    }
+
+    public void updateControl(double leftStickX, double leftStickY, double rightStickX) {
+        ManualDrive.driveOrHold(
+                follower,
+                ManualDrive.fieldCentric(
+                        -leftStickY,
+                        leftStickX,
+                        rightStickX,
+                        follower.pose().heading()
+                )
+        );
+
+        follower.update();
     }
 }

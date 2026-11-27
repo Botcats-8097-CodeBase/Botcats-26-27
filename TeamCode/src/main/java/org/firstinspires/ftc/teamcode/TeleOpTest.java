@@ -13,13 +13,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.subcomponents.BasicRobot;
 import org.firstinspires.ftc.teamcode.subcomponents.Blocker;
 import org.firstinspires.ftc.teamcode.subcomponents.Intake;
 import org.firstinspires.ftc.teamcode.subcomponents.Odometry;
 import org.firstinspires.ftc.teamcode.subcomponents.Shooter;
 import org.firstinspires.ftc.teamcode.utils.Limelight;
-import org.firstinspires.ftc.teamcode.utils.PIDFController;
 import org.firstinspires.ftc.teamcode.utils.RobotConstants;
 import org.firstinspires.ftc.teamcode.utils.TylerMath;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
@@ -40,7 +38,6 @@ public class TeleOpTest extends OpMode {
     Odometry odometry = new Odometry();
     Limelight limelight = new Limelight();
 
-    BasicRobot robot = new BasicRobot();
     Shooter shooter = new Shooter(
             new VelocityMotor(RobotConstants.tunedController, RobotConstants.dataFilterValue),
             new Blocker(),
@@ -159,6 +156,18 @@ public class TeleOpTest extends OpMode {
             yaw = odometry.getYaw();
         }
 
+        if (gamepad1.dpadDownWasPressed()) {
+            if (yawTrack == YawTrack.ODO) {
+                yawTrack = YawTrack.IMU;
+
+            }
+            else if (yawTrack == YawTrack.IMU) {
+                yawTrack = YawTrack.ODO;
+
+            }
+        }
+
+
         Vector2D move = new Vector2D(gamepad1.left_stick_x, -gamepad1.left_stick_y).rotateVector(-Math.toRadians(yaw - yawOffset));
         //set shooter
         shooter.toggleMode(gamepad1.backWasPressed());
@@ -173,10 +182,14 @@ public class TeleOpTest extends OpMode {
             shooter.resetAim();
         }
 
+
+
+
         shooter.setIntake(gamepad1.right_bumper, gamepad1.left_bumper);
         shooter.update();
 
-        robot.drivePower(move, rotation, coefficient);
+        odometry.updateControl(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation);
+
 
         pTelemetry.addData("goalDist", shooter.goalDist(isRed));
         pTelemetry.addData("x", odometry.getPose().x());
@@ -208,7 +221,6 @@ public class TeleOpTest extends OpMode {
         odometry.init(hardwareMap);
 
         //class init
-        robot.init(hardwareMap);
         shooter.init(
                 hardwareMap,
                 RobotConstants.pollenSpinnerName,
